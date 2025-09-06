@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Confession — For My Crush</title>
+  <style>
+    :root{--bg:#fff6f8;--card:#fff;--accent:#ff6b81;--muted:#6b6b6b}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff6f8,#fff0f3);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    .card{width:min(720px,96vw);background:var(--card);border-radius:16px;padding:28px;box-shadow:0 12px 40px rgba(255,107,129,0.12);text-align:center}
+    h1{margin:0 0 8px;font-size:1.6rem;color:#3a0f17}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    .heart{font-size:56px;line-height:1;margin:10px 0;color:var(--accent);transform:scale(0.98);transition:transform .25s ease}
+    .reveal{background:linear-gradient(90deg,#ffdde1,#ffd1dc);border-radius:12px;padding:18px;margin:12px auto;max-width:640px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
+    .confession{font-size:1.05rem;color:#4a2028;display:none}
+    .controls{display:flex;gap:8px;justify-content:center;margin-top:18px}
+    button{border:0;background:var(--accent);color:white;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer}
+    .btn-ghost{background:transparent;border:1px solid rgba(58,15,23,0.08);color:#3a0f17}
+    .note{color:var(--muted);font-size:0.9rem;margin-top:12px}
+    .copied{color:green;font-weight:700;margin-left:8px}
+    footer{margin-top:16px;font-size:0.85rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <h1>Confession</h1>
+    <div class="heart">❤️</div>
+    <p class="lead">Click the pink card to reveal the message. Use the buttons to copy or print your confession.</p>
+
+    <div class="reveal" id="reveal" tabindex="0" role="button" aria-pressed="false">
+      <div class="confession" id="confessionText">
+        Hi — I’ve been meaning to tell you something for a while now. Every time we talk, my day gets better. I like how you laugh, the way you pay attention to little things, and how being around you feels effortless. I don’t know what the future holds, but I wanted you to know: I have a crush on you. If you feel the same, I’d love to spend more time together. If not, I hope this still makes you smile.<br><br>
+        — Someone who thinks about you
+      </div>
+      <div class="muted" id="coverText">Tap to reveal your confession</div>
+    </div>
+
+    <div class="controls">
+      <button id="copyBtn">Copy confession</button>
+      <button id="printBtn" class="btn-ghost">Print</button>
+      <button id="editBtn" class="btn-ghost">Edit message</button>
+    </div>
+
+    <div class="note" id="note">Tip: You can personalize the message by clicking "Edit message". Keep it honest and kind.</div>
+
+    <footer>Made with a little courage 💌</footer>
+  </div>
+
+  <script>
+    const reveal = document.getElementById('reveal');
+    const confession = document.getElementById('confessionText');
+    const coverText = document.getElementById('coverText');
+    const copyBtn = document.getElementById('copyBtn');
+    const printBtn = document.getElementById('printBtn');
+    const editBtn = document.getElementById('editBtn');
+
+    let shown = false;
+    reveal.addEventListener('click', ()=> toggleReveal());
+    reveal.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') toggleReveal(); });
+
+    function toggleReveal(){
+      shown = !shown;
+      if(shown){ confession.style.display = 'block'; coverText.style.display = 'none'; reveal.classList.add('opened'); reveal.setAttribute('aria-pressed','true'); }
+      else { confession.style.display = 'none'; coverText.style.display = 'block'; reveal.setAttribute('aria-pressed','false'); }
+    }
+
+    copyBtn.addEventListener('click', async ()=>{
+      const text = confession.innerText.trim();
+      try{
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(()=> copyBtn.textContent = 'Copy confession', 1800);
+      }catch(e){
+        // fallback
+        const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        copyBtn.textContent = 'Copied ✓'; setTimeout(()=> copyBtn.textContent = 'Copy confession', 1800);
+      }
+    });
+
+    printBtn.addEventListener('click', ()=>{ window.print(); });
+
+    editBtn.addEventListener('click', ()=>{
+      const newText = prompt('Edit your confession:', confession.innerText);
+      if(newText !== null){ confession.innerHTML = newText.replace(/\n/g,'<br>'); shown = true; confession.style.display = 'block'; coverText.style.display='none'; }
+    });
+
+    // small accessibility: ensure initial state hidden
+    confession.style.display = 'none';
+  </script>
+</body>
+</html>
+
+
